@@ -1,28 +1,29 @@
-// db.js
-require('dotenv').config();
-const MongoClient = require('mongodb').MongoClient;
+// giftlink-backend/models/db.js
+const { MongoClient } = require('mongodb');
+require('dotenv').config(); 
 
-// MongoDB connection URL with authentication options
-let url = `${process.env.MONGO_URL}`;
-
-let dbInstance = null;
+const url = process.env.MONGO_URL;
 const dbName = "giftdb";
+let dbInstance = null;
+let client = null;
 
 async function connectToDatabase() {
-    if (dbInstance){
-        return dbInstance
-    };
+    if (dbInstance) {
+        return dbInstance;
+    }
 
-    const client = new MongoClient(url);      
+    if (!client) {
+        client = new MongoClient(url);
+    }
 
     // Task 1: Connect to MongoDB
-    // {{insert code}}
+    await client.connect();
 
     // Task 2: Connect to database giftDB and store in variable dbInstance
-    //{{insert code}}
+    dbInstance = client.db(dbName);
 
-    // Task 3: Return database instance
-    // {{insert code}}
+    // Task 3: Return the database instance
+    return dbInstance;
 }
 
 module.exports = connectToDatabase;
