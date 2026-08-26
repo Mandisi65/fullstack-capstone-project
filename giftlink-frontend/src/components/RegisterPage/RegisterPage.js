@@ -1,4 +1,13 @@
 import React, { useState } from 'react';
+// Task 1: Import urlConfig from `giftlink-frontend/src/config.js`
+import { urlConfig } from '../../config';
+
+// Task 2: Import useAppContext `giftlink-frontend/context/AuthContext.js`
+import { useAppContext } from '../../context/AuthContext';
+
+// Task 3: Import useNavigate from `react-router-dom` to handle navigation after successful registration.
+import { useNavigate } from 'react-router-dom';
+
 import './RegisterPage.css';
 
 function RegisterPage() {
@@ -8,9 +17,39 @@ function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    // Task 4: Include a state for error message.
+    const [showerr, setShowerr] = useState('');
+
+    // Task 5: Create a local variable for `navigate` and `setIsLoggedIn`.
+    const navigate = useNavigate();
+    const { setIsLoggedIn } = useAppContext();
+
     // Handle form registration
     const handleRegister = async () => {
-        console.log("Register invoked");
+        try {
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
+                // Task 6: Set method
+                method: 'POST',
+
+                // Task 7: Set headers
+                headers: {
+                    'content-type': 'application/json',
+                },
+
+                // Task 8: Set body to send user details
+                body: JSON.stringify({
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: password
+                })
+            });
+
+            // Step 2 logic will go here in the next step
+
+        } catch (e) {
+            console.log("Error fetching details: " + e.message);
+        }
     };
 
     return (
@@ -57,6 +96,7 @@ function RegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
+                            {showerr && <div className="text-danger mt-1 small">{showerr}</div>}
                         </div>
 
                         {/* Password Input */}
