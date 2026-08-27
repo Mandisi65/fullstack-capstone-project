@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+// Task 1: Use body and validationResult from express-validator for input validation
 const { body, validationResult } = require('express-validator');
 const connectToDatabase = require('../models/db');
 const router = express.Router();
@@ -104,6 +105,64 @@ router.post('/login', async (req, res) => {
 
     } catch (e) {
         logger.error('Error in login: ' + e.message);
+        return res.status(500).send('Internal server error');
+    }
+});
+
+// UPDATE PROFILE ROUTE
+router.put('/update', async (req, res) => {
+    // Task 2: Validate input using validationResult and return appropriate message if error
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.error('Validation errors in update request', errors.array());
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        // Task 3: Check if email is present in the header and throw error if not present
+        const email = req.headers.email;
+        if (!email) {
+            logger.error('Email not found in the request headers');
+            return res.status(400).json({ error: "Email not found in the request headers" });
+        }
+
+        // Task 4: Connect to giftsdb in MongoDB through connectToDatabase in db.js and access users collection
+        const db = await connectToDatabase();
+        const collection = db.collection("users");
+
+        // Task 5: Find user credentials in database
+        const existingUser = await collection.findOne({ email });
+        if (!existingUser) {
+            logger.error('User not found');
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Update fields if provided in request body
+        if (req.body.name) {
+            existingUser.firstName = req.body.name;
+        }
+        existingUser.updatedAt = new Date();
+
+        // Task 6: Update user credentials in database
+        const updatedUser = await collection.findOneAndUpdate(
+            { email },
+            { $set: existingUser },
+            { returnDocument: 'after' }
+        );
+
+        // Task 7: Create JWT authentication with user._id as payload using secret key from .env file
+        const payload = {
+            user: {
+                id: updatedUser._id.toString(),
+            },
+        };
+
+        const authtoken = jwt.sign(payload, JWT_SECRET);
+
+        res.json({ authtoken });
+
+    } catch (e) {
+        logger.error('Error in update: ' + e.message);
         return res.status(500).send('Internal server error');
     }
 });
