@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { urlConfig } from '../../config';
 import { useAppContext } from '../../context/AuthContext';
 
 export default function Navbar() {
@@ -37,7 +36,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light" id="navbar_container">
-        <a className="navbar-brand" href={`${urlConfig.backendUrl}/app`}>GiftLink</a>
+        <a className="navbar-brand" href={`/app`}>GiftLink</a>
 
         <button 
           className="navbar-toggler" 

@@ -45,10 +45,21 @@ function RegisterPage() {
                 })
             });
 
-            // Step 2 logic will go here in the next step
+            const json = await response.json();
+
+            if (json.authtoken) {
+                sessionStorage.setItem('auth-token', json.authtoken);
+                sessionStorage.setItem('name', firstName);
+                sessionStorage.setItem('email', email);
+                setIsLoggedIn(true);
+                navigate('/app');
+            } else if (json.error) {
+                setShowerr(json.error);
+            }
 
         } catch (e) {
             console.log("Error fetching details: " + e.message);
+            setShowerr("Failed to connect to the server.");
         }
     };
 
